@@ -32,11 +32,13 @@ pipeline {
       stage('Build and Push Image'){
          when {
             branch 'master'
-         }steps {
+         }
+         steps {
             script{
                  app = docker.build(REPOSITORY_TAG)  
-                 docker.withRegistry('https://registry.hub.docker.com','docker_hub_login')
-                 docker.push('latest')
+                 docker.withRegistry('https://registry.hub.docker.com','docker_hub_login'){
+                   docker.push('latest')
+                }  
             }
          }   
       }
