@@ -7,7 +7,7 @@ pipeline {
      // YOUR_DOCKERHUB_USERNAME (it doesn't matter if you don't have one)
 
      SERVICE_NAME = "fleetman-queue"
-     REPOSITORY_TAG="${YOUR_DOCKERHUB_USERNAME}/${ORGANIZATION_NAME}-${SERVICE_NAME}:${BUILD_ID}"
+     REPOSITORY_TAG="${YOUR_DOCKERHUB_USERNAME}/${ORGANIZATION_NAME}-${SERVICE_NAME}"
    }
 
    stages {
@@ -22,13 +22,25 @@ pipeline {
             sh '''echo No build required for Queue'''
          }
       }
-
+/*
       stage('Build and Push Image') {
          steps {
            sh 'docker image build -t ${REPOSITORY_TAG} . --network=host'
          }
       }
-
+*/
+      stage('Build and Push Image'){
+         when {
+            branch 'master'
+         }steps {
+            script{
+                 app = docker.build(REPOSITORY_TAG)  
+                 docker.withRegistry('https://registry.hub.docker.com','docker_hub_login')
+                 docker.push('latest')
+            }
+         }   
+      }
+      
       stage('Deploy to Cluster') {
           steps {
             sh 'envsubst < ${WORKSPACE}/deploy.yaml | kubectl apply -f -'
