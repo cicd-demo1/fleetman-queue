@@ -35,7 +35,7 @@ pipeline {
          }
          steps {
             script{
-                 app = docker.build(REPOSITORY_TAG)  
+                 app = docker.build(REPOSITORY_TAG, '--network=host .')  
                  docker.withRegistry('https://registry.hub.docker.com','docker_hub_login'){
                    docker.push('latest')
                 }  
